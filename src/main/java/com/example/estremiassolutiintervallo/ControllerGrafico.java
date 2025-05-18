@@ -16,6 +16,11 @@ public class ControllerGrafico {
     @FXML private WebView webView;
     private WebEngine webEngine;
 
+    // Variabili per memorizzare i dati del grafico
+    private String funzione;
+    private double limiteSinistro;
+    private double limiteDestro;
+
     /**
      * Inizializza il controller della scena del grafico.
      * Imposta la dimensione della WebView e gestisce i messaggi di tipo alert che gli arrivano da javascript.
@@ -61,6 +66,15 @@ public class ControllerGrafico {
     }
 
     /**
+     * Imposta i dati per il grafico
+     */
+    public void setDatiGrafico(String funzione, double limiteSinistro, double limiteDestro) {
+        this.funzione = funzione;
+        this.limiteSinistro = limiteSinistro;
+        this.limiteDestro = limiteDestro;
+    }
+
+    /**
      * Esegue un comando di GeoGebra passandolo a JavaScript.
      *
      * @param cmd il comando GeoGebra da eseguire. I caratteri speciali verranno rimossi per garantirne l'esecuzione corretta.
@@ -69,4 +83,5 @@ public class ControllerGrafico {
         String esc = cmd.replace("\"", "\\\"");
         webEngine.executeScript("window.ggb.evalCommand(\"" + esc + "\");");
     }
+
 }
