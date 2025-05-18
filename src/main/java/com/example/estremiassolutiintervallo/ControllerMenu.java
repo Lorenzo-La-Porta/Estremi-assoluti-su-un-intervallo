@@ -5,10 +5,12 @@ package com.example.estremiassolutiintervallo;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.Node;
@@ -46,7 +48,7 @@ public class ControllerMenu {
     /**
      * Metodo per caricare il grafico e passare i valori al ControllerGrafico
      */
-    @FXML
+   /* @FXML
     protected void OnClickGenera(ActionEvent event) throws IOException {
         if (!validInputs()) return;
 
@@ -74,7 +76,52 @@ public class ControllerMenu {
         stage.setTitle("Grafico GeoGebra");
         stage.show();
     }
+    */
 
+    /*
+    @FXML
+    protected void OnClickGenera(ActionEvent event) throws IOException {
+        if (!validInputs()) return;
+
+        // Carica il file FXML del grafico
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Grafico.fxml"));
+        BorderPane root = fxmlLoader.load();
+
+        // Ottieni il controller associato
+        ControllerGrafico controllerGrafico = fxmlLoader.getController();
+
+        // Passa i valori al controller grafico
+        controllerGrafico.setFunzione(funzione);
+        controllerGrafico.setLimiteSinistro(limiteSinistro);
+        controllerGrafico.setLimiteDestro(limiteDestro);
+
+        // Mostra la nuova scena
+        Scene scene = new Scene(root);
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.setScene(scene);
+        stage.setTitle("Grafico GeoGebra");
+        stage.show();
+    }
+    */
+
+    @FXML
+    protected void OnClickGenera(ActionEvent event) throws IOException {
+        if (!validInputs()) return;
+
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Grafico.fxml"));
+        Parent root = fxmlLoader.load();  // Cambiato da BorderPane a Parent
+
+        ControllerGrafico controllerGrafico = fxmlLoader.getController();
+        controllerGrafico.setFunzione(funzione);
+        controllerGrafico.setLimiteSinistro(limiteSinistro);
+        controllerGrafico.setLimiteDestro(limiteDestro);
+
+        Scene scene = new Scene(root);
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.setScene(scene);
+        stage.setTitle("Grafico GeoGebra");
+        stage.show();
+    }
 
     /**
      * Gestisce l'input della funzione

@@ -7,10 +7,19 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane stylesheets="@style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.estremiassolutiintervallo.ControllerMenu">
+<BorderPane stylesheets="@style.css"
+            xmlns="http://javafx.com/javafx/23.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.estremiassolutiintervallo.ControllerMenu">
     <center>
         <Label fx:id="lblErrore" textFill="red" />
-        <VBox fx:id="container" alignment="CENTER" maxWidth="480.0" prefHeight="557.0" prefWidth="406.0" spacing="20" styleClass="card">
+        <VBox fx:id="container"
+              alignment="CENTER"
+              maxWidth="480.0"
+              prefHeight="557.0"
+              prefWidth="406.0"
+              spacing="20"
+              styleClass="card">
             <padding>
                 <Insets bottom="50" left="40" right="40" top="50" />
             </padding>
@@ -19,16 +28,25 @@
 
             <VBox alignment="CENTER_LEFT" spacing="18" styleClass="input-group">
                 <Label text="Funzione:" />
-                <TextField fx:id="txtFunzione" onInputMethodTextChanged="#OnInputFunzione" promptText="inserire la funzione" />
+                <TextField fx:id="txtFunzione"
+                           onAction="#OnInputFunzione"
+                           promptText="inserire la funzione" />
 
                 <Label text="Limite sinistro (x):" />
-                <TextField fx:id="txtLimS" onInputMethodTextChanged="#OnInputLimS" promptText="inserire il limite sinistro" />
+                <TextField fx:id="txtLimS"
+                           onAction="#OnInputLimS"
+                           promptText="inserire il limite sinistro" />
 
                 <Label text="Limite destro (x):" />
-                <TextField fx:id="txtLimD" onInputMethodTextChanged="#OnInputLimD" promptText="inserire il limite destro" />
+                <TextField fx:id="txtLimD"
+                           onAction="#OnInputLimD"
+                           promptText="inserire il limite destro" />
             </VBox>
 
-            <Button fx:id="btnGenera" onAction="#OnClickGenera" styleClass="primary-button" text="Genera Grafico">
+            <Button fx:id="btnGenera"
+                    onAction="#OnClickGenera"
+                    styleClass="primary-button"
+                    text="Genera Grafico">
                 <VBox.margin>
                     <Insets bottom="0" left="0" right="0" top="20" />
                 </VBox.margin>

@@ -62,7 +62,7 @@ public class ControllerGrafico {
      * Invia a GeoGebra la definizione di una funzione limitata a destra e sinistra
      * e posiziona i punti massimo e minimo per verificare il teorema di Weierstrass.
      */
-    private void inviaComandiGeoGebra() {
+ /*   private void inviaComandiGeoGebra() {
 
 
         CalcolaMassimoMinimo calcolaMassimoMinimo = new CalcolaMassimoMinimo();
@@ -77,6 +77,26 @@ public class ControllerGrafico {
         eseguiComandoGeogebra("massimo=Point({(" + calcolaMassimoMinimo.getXMassimo() + "," + calcolaMassimoMinimo.getYMassimo() + ")})");
         eseguiComandoGeogebra("minimo=Point({(" + calcolaMassimoMinimo.getXMinimo() + "," + calcolaMassimoMinimo.getYMinimo() + ")})");
     }
+*/
+
+    private void inviaComandiGeoGebra() {
+        CalcolaMassimoMinimo calcolaMassimoMinimo = new CalcolaMassimoMinimo();
+
+        // Usa i dati ricevuti tramite i setter
+        String funzioneCompleta = funzione;
+        double limite_destro = limiteDestro;
+        double limite_sinistro = limiteSinistro;
+
+        // Calcola i valori massimi e minimi
+        calcolaMassimoMinimo.calcolaMassimoMinimo(funzioneCompleta, limite_destro, limite_sinistro);
+
+        String funzioneConEstremi = String.format(Locale.US,
+                "f(x)=If(x>=%f && x<=%f, %s)", limite_sinistro, limite_destro, funzioneCompleta);
+        eseguiComandoGeogebra(funzioneConEstremi);
+
+        eseguiComandoGeogebra("massimo=Point({(" + calcolaMassimoMinimo.getXMassimo() + "," + calcolaMassimoMinimo.getYMassimo() + ")})");
+        eseguiComandoGeogebra("minimo=Point({(" + calcolaMassimoMinimo.getXMinimo() + "," + calcolaMassimoMinimo.getYMinimo() + ")})");
+    }
 
     /**
      * Esegue un comando di GeoGebra passandolo a JavaScript.
@@ -86,6 +106,22 @@ public class ControllerGrafico {
     private void eseguiComandoGeogebra(String cmd) {
         String esc = cmd.replace("\"", "\\\"");
         webEngine.executeScript("window.ggb.evalCommand(\"" + esc + "\");");
+    }
+
+    private String funzione;
+    private double limiteSinistro;
+    private double limiteDestro;
+
+    public void setFunzione(String funzione) {
+        this.funzione = funzione;
+    }
+
+    public void setLimiteSinistro(double limiteSinistro) {
+        this.limiteSinistro = limiteSinistro;
+    }
+
+    public void setLimiteDestro(double limiteDestro) {
+        this.limiteDestro = limiteDestro;
     }
 
 }
