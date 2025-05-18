@@ -1,107 +1,99 @@
-/*
-Parte di Sofia
-*/
+// Parte di Sofia
 package com.example.estremiassolutiintervallo;
 
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
+/**
+ * Classe per calcolare massimo e minimo di una funzione in un intervallo.
+ */
 public class CalcolaMassimoMinimo {
 
-    private double yMassimo;  // Valore y massimo calcolato
-    private double yMinimo;   // Valore y minimo calcolato
-    private double xMassimo; // Coordinata x del massimo
-    private double xMinimo;  // Coordinata x del minimo
+    // Risultati calcolati
+    private double yMassimo;      // Valore y massimo trovato
+    private double yMinimo;       // Valore y minimo trovato
+    private double xMassimo;      // Coordinata x del massimo
+    private double xMinimo;       // Coordinata x del minimo
+
+    private static final int SAMPLES = 1000; // Numero di punti per il campionamento
 
     /**
-     * Metodo per calcolare il valore della funzione data una stringa ed un valore di x.
-     *
-     * @param funzione La funzione come stringa, es. "x^2 - 4*x + 3".
-     * @param x Il valore di x.
-     * @return Il risultato della funzione per il valore di x.
+     * Valuta la funzione in un punto x usando exp4j.
+     * @param funzione espressione come stringa (es. "x^2+1").
+     * @param x valore di x.
+     * @return risultato numerico.
      */
     private static double funzione(String funzione, double x) {
         try {
-            // Crea l'espressione e inserisce il valore di x
-            Expression expression = new ExpressionBuilder(funzione)
-                    .variables("x") // Aggiunge la variabile x
+            Expression expr = new ExpressionBuilder(funzione)
+                    .variables("x")            // definisce "x"
                     .build()
-                    .setVariable("x", x); // Imposta il valore di x
-
-            // Calcola e ritorna il risultato
-            return expression.evaluate();
+                    .setVariable("x", x);     // imposta valore x
+            return expr.evaluate();           // calcola e ritorna
         } catch (Exception e) {
-            throw new RuntimeException("Errore nel calcolo della funzione: " + e.getMessage());
+            // rilancio in caso di errori di parsing o valutazione
+            throw new RuntimeException("Errore nel calcolo: " + e.getMessage());
         }
     }
 
     /**
-     * Calcola massimo e minimo della funzione nell'intervallo [a, b].
-     *
-     * I dati (funzione, limiti) sono ottenuti tramite i getter di ControllerMenu.
-     * I risultati (massimo e minimo, incluse le coordinate) sono memorizzati nelle variabili della classe.
+     * Campiona la funzione in SAMPLES punti e trova estremo max/min.
+     * @param funzione stringa della funzione
+     * @param limiteSinistro inizio intervallo
+     * @param limiteDestro fine intervallo
      */
     public void calcolaMassimoMinimo(String funzione, double limiteDestro, double limiteSinistro) {
-        int n = 1000; // Numero di punti per il calcolo
-        double passo = (limiteDestro - limiteSinistro) / n;
+        double passo = (limiteDestro - limiteSinistro) / SAMPLES; // distanza tra campioni
 
+        // inizializza con il primo punto
         double x = limiteSinistro;
         double y = funzione(funzione, x);
-
-        // Inizializza il massimo e il minimo
         yMassimo = y;
         yMinimo = y;
-        xMassimo = x; // Memorizza la coordinata x del massimo
-        xMinimo = x; // Memorizza la coordinata x del minimo
+        xMassimo = x;
+        xMinimo = x;
 
-        // Esegui il calcolo iterando nell'intervallo
-        for (int i = 1; i <= n; i++) {
+        // scorre i campioni restanti
+        for (int i = 1; i <= SAMPLES; i++) {
             x = limiteSinistro + i * passo;
             y = funzione(funzione, x);
             if (y < yMinimo) {
                 yMinimo = y;
-                xMinimo = x; // Aggiorna la coordinata x del minimo
+                xMinimo = x;
             }
             if (y > yMassimo) {
                 yMassimo = y;
-                xMassimo = x; // Aggiorna la coordinata x del massimo
+                xMassimo = x;
             }
         }
     }
 
-    /**
-     * Restituisce il massimo y calcolato.
-     *
-     * @return valore y massimo
-     */
-    public double getYMassimo() {
-        return yMassimo;
-    }
+    // getter per i risultati
+    public double getYMassimo() { return yMassimo; }
+    public double getYMinimo()  { return yMinimo; }
+    public double getXMassimo() { return xMassimo; }
+    public double getXMinimo()  { return xMinimo; }
 
     /**
-     * Restituisce il minimo y calcolato.
-     *
-     * @return valore y minimo
+     * Verifica la continuità valutando la funzione in SAMPLES punti.
+     * @param funzione stringa della funzione
+     * @param limS inizio intervallo
+     * @param limD fine intervallo
+     * @return true se non si verificano errori o valori infiniti/NaN
      */
-    public double getYMinimo() {
-        return yMinimo;
-    }
-
-    /**
-     * Restituisce la coordinata x del massimo.
-     *
-     * @return coordinata x del massimo
-     */
-    public double getXMassimo() {
-        return xMassimo;
-    }
-
-    /**
-     * Restituisce la coordinata x del minimo.
-     *
-     * @return coordinata x del minimo
-     */
-    public double getXMinimo() {
-        return xMinimo;
+    public static boolean isContinuous(String funzione, double limS, double limD) {
+        double passo = (limD - limS) / SAMPLES;
+        for (int i = 0; i <= SAMPLES; i++) {
+            double x = limS + i * passo;
+            try {
+                double y = funzione(funzione, x);
+                if (Double.isNaN(y) || Double.isInfinite(y)) {
+                    return false;  // valore non valido indica discontinuità
+                }
+            } catch (RuntimeException e) {
+                return false;      // eccezione indica discontinuità
+            }
+        }
+        return true;               // nessun problema, funzione continua
     }
 }

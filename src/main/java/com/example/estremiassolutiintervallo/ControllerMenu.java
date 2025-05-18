@@ -44,66 +44,6 @@ public class ControllerMenu {
     private double limiteSinistro;
     private double limiteDestro;
 
-
-    /**
-     * Metodo per caricare il grafico e passare i valori al ControllerGrafico
-     */
-   /* @FXML
-    protected void OnClickGenera(ActionEvent event) throws IOException {
-        if (!validInputs()) return;
-
-        // 1. Recupera l’URL “base” del FXML
-        URL baseFxml = getClass().getResource("Grafico.fxml");
-        if (baseFxml == null) {
-            showAlert(Alert.AlertType.ERROR, "Impossibile trovare Grafico.fxml");
-            return;
-        }
-
-        // 2. Costruisci la query string (URL‐encode i parametri!)
-        String qs = String.format("?funzione=%s&limS=%s&limD=%s",
-                URLEncoder.encode(funzione, StandardCharsets.UTF_8),
-                URLEncoder.encode(Double.toString(limiteSinistro), StandardCharsets.UTF_8),
-                URLEncoder.encode(Double.toString(limiteDestro), StandardCharsets.UTF_8)
-        );
-
-        // 3. Carica col FXML che ha già la query
-        FXMLLoader fxmlLoader = new FXMLLoader(new URL(baseFxml.toExternalForm() + qs));
-        Scene scene = new Scene(fxmlLoader.load());
-
-        // 4. Cambio scena
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setScene(scene);
-        stage.setTitle("Grafico GeoGebra");
-        stage.show();
-    }
-    */
-
-    /*
-    @FXML
-    protected void OnClickGenera(ActionEvent event) throws IOException {
-        if (!validInputs()) return;
-
-        // Carica il file FXML del grafico
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Grafico.fxml"));
-        BorderPane root = fxmlLoader.load();
-
-        // Ottieni il controller associato
-        ControllerGrafico controllerGrafico = fxmlLoader.getController();
-
-        // Passa i valori al controller grafico
-        controllerGrafico.setFunzione(funzione);
-        controllerGrafico.setLimiteSinistro(limiteSinistro);
-        controllerGrafico.setLimiteDestro(limiteDestro);
-
-        // Mostra la nuova scena
-        Scene scene = new Scene(root);
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setScene(scene);
-        stage.setTitle("Grafico GeoGebra");
-        stage.show();
-    }
-    */
-
     @FXML
     protected void OnClickGenera(ActionEvent event) throws IOException {
         if (!validInputs()) return;
@@ -159,43 +99,47 @@ public class ControllerMenu {
      * Valida gli input dell'utente
      */
     private boolean validInputs() {
+        // 1) Funzione come stringa
         funzione = txtFunzione.getText().trim();
         if (funzione.isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Inserire una funzione valida!");
             return false;
         }
-
-        // Controlla che la funzione contenga almeno una 'x'
         if (!funzione.contains("x")) {
             showAlert(Alert.AlertType.ERROR, "La funzione deve contenere almeno una variabile 'x'!");
             return false;
         }
-
-        // Controlla che la funzione contenga solo numeri, spazi, operatori, parentesi e la variabile 'x'
         if (!funzione.matches("[0-9x+\\-*/^(). ]+")) {
-            showAlert(Alert.AlertType.ERROR, "La funzione contiene caratteri non validi. Sono ammesse solo cifre, operatori (+, -, *, /, ^), parentesi e la variabile 'x'.");
+            showAlert(Alert.AlertType.ERROR,
+                    "La funzione contiene caratteri non validi. Sono ammesse solo cifre, operatori (+, -, *, /, ^), parentesi e la variabile 'x'.");
             return false;
         }
 
+        // 2) Parse dei limiti
         try {
             limiteSinistro = Double.parseDouble(txtLimS.getText().trim().replace(",", "."));
         } catch (NumberFormatException e) {
             showAlert(Alert.AlertType.ERROR, "Il limite sinistro deve essere un numero!");
             return false;
         }
-
         try {
             limiteDestro = Double.parseDouble(txtLimD.getText().trim().replace(",", "."));
         } catch (NumberFormatException e) {
             showAlert(Alert.AlertType.ERROR, "Il limite destro deve essere un numero!");
             return false;
         }
-
         if (limiteSinistro >= limiteDestro) {
             showAlert(Alert.AlertType.ERROR, "Il limite sinistro deve essere minore del limite destro!");
             return false;
         }
 
+        // 3) Controllo di continuità con exp4j
+        if (!CalcolaMassimoMinimo.isContinuous(funzione, limiteSinistro, limiteDestro)) {
+            showAlert(Alert.AlertType.ERROR, "La funzione non è continua nell'intervallo specificato!");
+            return false;
+        }
+
+        // Tutto ok
         return true;
     }
 
@@ -232,5 +176,54 @@ public class ControllerMenu {
 
     public void setLimiteDestro(double limiteDestro) {
         this.limiteDestro = limiteDestro;
+    }
+
+    private boolean isFunctionContinuous(String funzione, double start, double end) {
+        // Per semplicità, verifica se funzione contiene divisioni "/"
+        // e prova a verificare denominatore in start e end (solo esempi semplici)
+        if (!funzione.contains("/")) {
+            return true;  // se non ci sono divisioni, per ora assumiamo continua
+        }
+
+        // Estrai la parte dopo '/' e valuta denominatore ai limiti (molto rudimentale)
+        // Nota: serve un parser matematico per una valutazione corretta!
+        try {
+            String[] parts = funzione.split("/");
+            for (int i = 1; i < parts.length; i++) {
+                String denom = parts[i].split("[+\\-*/^()]")[0].trim();
+                // Prova a sostituire 'x' con i limiti e valutare se denominatore = 0
+                double valStart = evaluateExpression(denom.replace("x", Double.toString(start)));
+                double valEnd = evaluateExpression(denom.replace("x", Double.toString(end)));
+
+                if (valStart == 0 || valEnd == 0) {
+                    return false;  // discontinuità per divisione per zero ai limiti
+                }
+            }
+        } catch (Exception e) {
+            // in caso di errore di parsing, assumiamo discontinua per sicurezza
+            return false;
+        }
+
+        return true;
+    }
+
+    // Metodo rudimentale di valutazione di espressioni semplici numeriche (solo numeri)
+    private double evaluateExpression(String expr) {
+        // Qui potresti usare librerie esterne tipo exp4j o simili,
+        // oppure implementare un parser base
+        // Per esempio, qui solo conversione diretta se è numero:
+        return Double.parseDouble(expr);
+    }
+
+    private boolean isContinuous(String funzione, double limS, double limD) {
+        // Controllo molto semplice: se c'è una divisione per "x" e zero è nell'intervallo
+        if (funzione.contains("/x")) {
+            if (limS <= 0 && limD >= 0) {
+                return false; // discontinuity at x=0 inside interval
+            }
+        }
+        // Puoi aggiungere altri casi più complessi
+
+        return true; // continua per default
     }
 }
