@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Parte di Sodo
+-->
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.estremiassolutiintervallo.ControllerMenu"
+      alignment="CENTER"
+      spacing="20"
+      prefHeight="400.0"
+      prefWidth="600.0">
+
+    <!-- Pulsante per passare alla scena del grafico -->
+    <Button fx:id="loadGraphButton"
+            text="Carica Grafico"
+            onAction="#onLoadGraphButtonClick" />
+</VBox>

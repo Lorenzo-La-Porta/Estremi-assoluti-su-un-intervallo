@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Parte di Lollo
+-->
+
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.web.WebView?>
+
+<AnchorPane xmlns="http://javafx.com/javafx/23.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.estremiassolutiintervallo.ControllerGrafico">
+
+    <!-- Ancoro il WebView a 0 su tutti i lati in modo che riempia sempre l'AnchorPane -->
+    <WebView fx:id="webView"
+             AnchorPane.topAnchor="0.0"
+             AnchorPane.bottomAnchor="0.0"
+             AnchorPane.leftAnchor="0.0"
+             AnchorPane.rightAnchor="0.0" />
+</AnchorPane>

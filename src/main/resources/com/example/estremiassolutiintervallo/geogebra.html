@@ -1,0 +1,51 @@
+<!--
+Parte di Lollo
+-->
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8" />
+    <title></title>
+    <!-- Libreria che permette di usare correttamente l'API -->
+    <script src="https://www.geogebra.org/apps/deployggb.js"></script>
+    <!-- Imposto la dimensione del contenitore di geogebra a quella della webview -->
+    <style>
+        html, body, #contenitoreGeogebra {
+          margin: 0;
+          padding: 0;
+          width: 100%;
+          height: 100%;
+        }
+    </style>
+</head>
+<body>
+<div id="contenitoreGeogebra"></div>
+
+<script>
+    // Quando la pagina web è completamente caricata
+    window.addEventListener("load", () => {
+        // Oggetto che serve a inizializzare l'app
+        new GGBApplet({
+            // Versione di geogebra da caricare
+            appName: "classic",
+            // Nasconde la barra degli strumenti
+            showToolBar: false,
+            // Mostra la barra per inserire formule algebriche manualmente
+            showAlgebraInput: true,
+            // Nasconde la barra del menu
+            showMenuBar: false,
+            // Identificatore per l’app Geogebra
+            id: "appGeogebra",
+            // Lingua di Geogebra
+            language: "it",
+            // Carica l'API di geogebra e invia l'alert "GeogebraPronto"
+            appletOnLoad: api => {
+              window.ggb = api;
+              alert("GeogebraPronto");
+            }
+        }, true).inject("contenitoreGeogebra"); // Indica dove deve essere inserita l'API
+    });
+</script>
+</body>
+</html>
