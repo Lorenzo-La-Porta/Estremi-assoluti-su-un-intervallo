@@ -150,4 +150,31 @@ public class ControllerMenu {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
+    // Getter e setter per funzione
+    public String getFunzione() {
+        return funzione;
+    }
+
+    public void setFunzione(String funzione) {
+        this.funzione = funzione;
+    }
+
+    // Getter e setter per limiteSinistro
+    public double getLimiteSinistro() {
+        return limiteSinistro;
+    }
+
+    public void setLimiteSinistro(double limiteSinistro) {
+        this.limiteSinistro = limiteSinistro;
+    }
+
+    // Getter e setter per limiteDestro
+    public double getLimiteDestro() {
+        return limiteDestro;
+    }
+
+    public void setLimiteDestro(double limiteDestro) {
+        this.limiteDestro = limiteDestro;
+    }
 }
