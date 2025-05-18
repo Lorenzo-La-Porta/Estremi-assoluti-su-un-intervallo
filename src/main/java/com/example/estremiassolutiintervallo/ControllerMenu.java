@@ -16,6 +16,9 @@ import javafx.event.ActionEvent;
 
 import java.awt.event.InputMethodEvent;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 public class ControllerMenu {
 
@@ -45,21 +48,27 @@ public class ControllerMenu {
      */
     @FXML
     protected void OnClickGenera(ActionEvent event) throws IOException {
-        // Validazione degli input, mostra alert se non validi
-        if (!validInputs()) {
-            return; // Se input non validi, blocca qui e mostra alert
+        if (!validInputs()) return;
+
+        // 1. Recupera l’URL “base” del FXML
+        URL baseFxml = getClass().getResource("Grafico.fxml");
+        if (baseFxml == null) {
+            showAlert(Alert.AlertType.ERROR, "Impossibile trovare Grafico.fxml");
+            return;
         }
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Grafico.fxml"));
+        // 2. Costruisci la query string (URL‐encode i parametri!)
+        String qs = String.format("?funzione=%s&limS=%s&limD=%s",
+                URLEncoder.encode(funzione, StandardCharsets.UTF_8),
+                URLEncoder.encode(Double.toString(limiteSinistro), StandardCharsets.UTF_8),
+                URLEncoder.encode(Double.toString(limiteDestro), StandardCharsets.UTF_8)
+        );
+
+        // 3. Carica col FXML che ha già la query
+        FXMLLoader fxmlLoader = new FXMLLoader(new URL(baseFxml.toExternalForm() + qs));
         Scene scene = new Scene(fxmlLoader.load());
 
-        // Ottieni il controller della nuova scena
-        ControllerGrafico controllerGrafico = fxmlLoader.getController();
-
-        // Passa i valori al controller del grafico
-        controllerGrafico.setDatiGrafico(funzione, limiteSinistro, limiteDestro);
-
-        // Cambia scena
+        // 4. Cambio scena
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.setScene(scene);
         stage.setTitle("Grafico GeoGebra");

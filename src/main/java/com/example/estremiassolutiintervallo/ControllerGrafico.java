@@ -13,13 +13,20 @@ import java.util.Objects;
 
 public class ControllerGrafico {
 
+    private ControllerMenu menu;
+    private CalcolaMassimoMinimo calc;
+
+    // Setter per il controller del menu
+    public void setMenuController(ControllerMenu menu) {
+        this.menu = menu;
+    }
+    // Setter per il calcolatore degli estremi
+    public void setCalcolatore(CalcolaMassimoMinimo calc) {
+        this.calc = calc;
+    }
+
     @FXML private WebView webView;
     private WebEngine webEngine;
-
-    // Variabili per memorizzare i dati del grafico
-    private String funzione;
-    private double limiteSinistro;
-    private double limiteDestro;
 
     /**
      * Inizializza il controller della scena del grafico.
@@ -41,7 +48,7 @@ public class ControllerGrafico {
                 // Imposto la dimensione della scena a quella della webview
                 String jsResize = String.format(Locale.US, "document.getElementById('contenitoreGeogebra').style.width='%fpx';" + "document.getElementById('contenitoreGeogebra').style.height='%fpx';" + "window.ggb.setSize(%f, %f);", lunghezza, larghezza, lunghezza, larghezza);
                 webEngine.executeScript(jsResize);
-                // Invio della funzione e dei punti massimo e minimo
+                // Si passa all'invio dei comandi a geogebra
                 inviaComandiGeoGebra();
             }
         });
@@ -56,22 +63,19 @@ public class ControllerGrafico {
      * e posiziona i punti massimo e minimo per verificare il teorema di Weierstrass.
      */
     private void inviaComandiGeoGebra() {
-        double limte_sinistro = -2;
-        double limte_destro = 2;
-        String funzioneCompleta = "x^2";
-        String funzioneConEstremi = String.format(Locale.US,"f(x)=If(x>=%f && x<=%f, %s)", limte_sinistro, limte_destro, funzioneCompleta);
-        eseguiComandoGeogebra(funzioneConEstremi);
-        eseguiComandoGeogebra("massimo=Point({(2,4)})");
-        eseguiComandoGeogebra("minimo=Point({(0,0)})");
-    }
 
-    /**
-     * Imposta i dati per il grafico
-     */
-    public void setDatiGrafico(String funzione, double limiteSinistro, double limiteDestro) {
-        this.funzione = funzione;
-        this.limiteSinistro = limiteSinistro;
-        this.limiteDestro = limiteDestro;
+
+        CalcolaMassimoMinimo calcolaMassimoMinimo = new CalcolaMassimoMinimo();
+        String funzioneCompleta = controllerMenu.getFunzione();
+        double limite_destro = controllerMenu.getLimiteDestro();
+        double limite_sinistro = controllerMenu.getLimiteSinistro();
+
+        // Calcola i valori massimi e minimi
+        calcolaMassimoMinimo.calcolaMassimoMinimo(funzioneCompleta, limite_destro, limite_sinistro);
+        String funzioneConEstremi = String.format(Locale.US,"f(x)=If(x>=%f && x<=%f, %s)", limite_sinistro, limite_destro, funzioneCompleta);
+        eseguiComandoGeogebra(funzioneConEstremi);
+        eseguiComandoGeogebra("massimo=Point({(" + calcolaMassimoMinimo.getXMassimo() + "," + calcolaMassimoMinimo.getYMassimo() + ")})");
+        eseguiComandoGeogebra("minimo=Point({(" + calcolaMassimoMinimo.getXMinimo() + "," + calcolaMassimoMinimo.getYMinimo() + ")})");
     }
 
     /**
